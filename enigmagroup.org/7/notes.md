@@ -13,7 +13,12 @@
 
 The file App7.exe is a C++ cracking compiled with MingWin32 v4.9.9.1 as shown by CFF Explorer.
 
+![alt text](images/image9.png)
 ![alt text](images/image1.png)
+
+At launch, it asks for a password in our cmd.exe.
+
+![alt text](images/image0.png)
 
 Having a look into binary ninja in order to understand how it works, we identify a function :
 - Utils::convertArgvTopszArgs(int,char **,std::string *)
