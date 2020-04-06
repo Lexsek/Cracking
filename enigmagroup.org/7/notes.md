@@ -11,7 +11,7 @@
 
 ### First look
 
-The file App7.exe is a C++ cracking compiled with MingWin32 v4.9.9.1 as shown by CFF Explorer.
+The file App7.exe is a C++ PE32 executable cracking compiled with MingWin32 v4.9.9.1 as shown by CFF Explorer.
 
 ![alt text](images/image1.png)
 
