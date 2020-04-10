@@ -132,11 +132,8 @@ bw.seek(packed)
 key = [0x10, 0x20, 0x30, 0x40, 0x50]
 
 for b in range(0, count):
-    try:
-        data = ord(br.read(1)) ^ key[b % len(key)]
-        print chr(bw.write(chr(data)))
-    except:
-        pass
+    data = ord(br.read(1)) ^ key[b % len(key)]
+    print chr(bw.write(chr(data)))
 
 fm.create_database("/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/unpacked.bndb")
 print fm.saved
