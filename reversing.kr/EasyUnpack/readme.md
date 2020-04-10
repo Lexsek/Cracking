@@ -112,6 +112,19 @@ We can use binary ninja api in order to unpack the packed code and reproduce all
 from binaryninja import *
 import time
 
+def unpack(start, end):
+
+    count = end - start
+    key = [0x10, 0x20, 0x30, 0x40, 0x50]
+    br.seek(start)
+    bw.seek(start)
+    for b in range(0, count):
+        try:
+            data = ord(br.read(1)) ^ key[b % len(key)]
+            print chr(bw.write(chr(data)))
+        except:
+            pass
+
 filepath = "/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/files/Easy_UnpackMe.exe"
 dbpath = "/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/Easy_UnpackMe.bndb"
 fm = FileMetadata()
@@ -122,24 +135,15 @@ bw = BinaryWriter(bv)
 bv.update_analysis()
 time.sleep(1)
 
-packed = bv.start + 0x1000
-count = bv.start + 0x5000 - packed
-print count
-
-br.seek(packed)
-bw.seek(packed)
-
-key = [0x10, 0x20, 0x30, 0x40, 0x50]
-
-for b in range(0, count):
-    data = ord(br.read(1)) ^ key[b % len(key)]
-    print chr(bw.write(chr(data)))
+unpack(bv.start + 0x9000, bv.start + 0x94ee)
+unpack(bv.start + 0x1000, bv.start + 0x5000)
+unpack(bv.start + 0x6000, bv.start + 0x9000)
 
 fm.create_database("/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/unpacked.bndb")
 print fm.saved
 ```
 
-Now the jmp 0x401150 points to valid code !
+Now the jmp 0x401150 points to valid code, the data section is valid, and the strings for the imported functions are now unencrypted.
 
 ![alt text](images/image14.png)
 
