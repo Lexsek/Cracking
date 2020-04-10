@@ -60,7 +60,9 @@ Then it will mov the start address of the first encrypted chunk in ecx, and the 
 
 #### IAT unpack
 
-The Import Address table start address is stored in ecx. 
+The Import Address table start address is stored in ecx.
+
+It consists of a call table of user-space modules. All the functions address will be written here.
 
 The loop will simply xor all the import address table with the key "\x10\x20\x30\x40\x50", and also change the memory page protection of the .rdata section with Read/Write.
 
@@ -72,11 +74,11 @@ The decrypted block will contain the name of the functions that will be loaded a
 
 This block consists of iterating over the function names that have been decrypted by the IAT unpack routine, and loading at runtime these functions.
 
-Loading the modules:
+Loading the modules will be done by iterating on the function names and calling the LoadLibrary from the WINAPI that consists of loading a module in memory.
 
 ![alt text](images/image7.png)
 
-Getting the address the functions:
+Getting the address the functions with the GetProcAddress WINAPI function and storing them in memory.
 
 ![alt text](images/image8.png)
 
@@ -84,13 +86,13 @@ At the end, it will change the permission of the executable code by giving it Wr
 
 #### Executable code unpack
 
-This loop consists of unpacking the executable code with the key "\x10\x20\x30\x40\x50".
+This loop consists of unpacking the executable code with the key "\x10\x20\x30\x40\x50", the same way it did with the IAT unpack.
 
 ![alt text](images/image9.png)
 
 #### .data unpack
 
-This loop consists of unpacking the .data section with the key "\x10\x20\x30\x40\x50".
+This loop consists of unpacking the .data section with the key "\x10\x20\x30\x40\x50" the same way it did with the IAT unpack.
 
 ![alt text](images/image10.png)
 
@@ -101,6 +103,48 @@ And then jumping on the unpacked code, so the real entry point of the program is
 The unpacked code will simply create a white window.
 
 ![alt text](images/image12.png)
+
+### Unpacking with Binja API
+
+We can use binary ninja api in order to unpack the packed code and reproduce all the unpack of the malware.
+
+```python
+from binaryninja import *
+import time
+
+filepath = "/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/files/Easy_UnpackMe.exe"
+dbpath = "/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/Easy_UnpackMe.bndb"
+fm = FileMetadata()
+db = fm.open_existing_database(dbpath)
+bv = db.get_view_of_type('PE')
+br = BinaryReader(bv)
+bw = BinaryWriter(bv)
+bv.update_analysis()
+time.sleep(1)
+
+packed = bv.start + 0x1000
+count = bv.start + 0x5000 - packed
+print count
+
+br.seek(packed)
+bw.seek(packed)
+
+key = [0x10, 0x20, 0x30, 0x40, 0x50]
+
+for b in range(0, count):
+    try:
+        data = ord(br.read(1)) ^ key[b % len(key)]
+        print chr(bw.write(chr(data)))
+    except:
+        pass
+
+fm.create_database("/home/lexsek/GITHUB/Cracking/reversing.kr/EasyUnpack/unpacked.bndb")
+print fm.saved
+```
+
+Now the jmp 0x401150 points to valid code !
+
+![alt text](images/image14.png)
 
 ### Conclusion
 
