@@ -325,7 +325,7 @@ remove_operation_files
 So now, we can connect to the remote server, download the encrypted files.
 
 ```console
-lexsek@lexsek:~$ ssh sftp -P 4000 wannasmile@challenges1.hexionteam.com
+lexsek@lexsek:~$ sftp -P 4000 wannasmile@challenges1.hexionteam.com
 wannasmile@challenges1.hexionteam.com's password: 
 Connected to challenges1.hexionteam.com.
 sftp> cd /var/wannasmile2/
